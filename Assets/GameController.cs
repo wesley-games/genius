@@ -11,6 +11,16 @@ public class GameController : MonoBehaviour
     private int sequenceSize = 3;
     private GameObject[] sequence;
 
+    void OnEnable()
+    {
+        ButtonController.OnButtonClicked += OnButtonClicked;
+    }
+
+    void OnDisable()
+    {
+        ButtonController.OnButtonClicked -= OnButtonClicked;
+    }
+
     void Start()
     {
         StartCoroutine(GameLoop());
@@ -18,12 +28,12 @@ public class GameController : MonoBehaviour
 
     IEnumerator GameLoop () 
     {
-        while (!lose)
-        {
+        // while (!lose)
+        // {
             sequence = GenerateRandomSequence(sequenceSize);
             yield return StartCoroutine(AnimateButtons(sequence));
             yield return new WaitForSeconds(2);
-        }
+        // }
         yield return null;
     }
 
@@ -40,10 +50,16 @@ public class GameController : MonoBehaviour
     IEnumerator AnimateButtons(GameObject[] sequence) {
         foreach (GameObject button in sequence)
         {
+            Debug.Log(button.GetComponent<ButtonController>().type);
             button.GetComponent<ButtonController>().Inflate();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
             button.GetComponent<ButtonController>().Deflate();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    void OnButtonClicked(ButtonController button)
+    {
+        Debug.Log(button.GetComponent<ButtonController>().type);
     }
 }
