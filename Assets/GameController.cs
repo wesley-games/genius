@@ -9,7 +9,8 @@ public class GameController : MonoBehaviour
     
     private bool lose = false;
     private int sequenceSize = 3;
-    private GameObject[] sequence;
+    private List<ButtonController> sequence;
+    private List<ButtonController> playerSequence;
 
     void OnEnable()
     {
@@ -28,38 +29,71 @@ public class GameController : MonoBehaviour
 
     IEnumerator GameLoop () 
     {
-        // while (!lose)
-        // {
+        while (!lose)
+        {
             sequence = GenerateRandomSequence(sequenceSize);
             yield return StartCoroutine(AnimateButtons(sequence));
-            yield return new WaitForSeconds(2);
-        // }
+            playerSequence = new List<ButtonController>();
+            yield return StartCoroutine(WaitPlayerInput());
+
+            if (EvaluatePlayerInput())
+            {
+                yield return new WaitForSeconds(2);
+                Debug.Log("Ganhou !");
+                Level++;
+                sequenceSize++;
+            } else
+            {
+                lose = true;
+            }
+            yield return null;
+        }
+        Debug.Log("Perdeu !");
         yield return null;
     }
 
-    GameObject[] GenerateRandomSequence(int size)
+    List<ButtonController> GenerateRandomSequence(int size)
     {
-        GameObject[] sequence = new GameObject[size];
+        List<ButtonController> sequence = new List<ButtonController>();
         for (int i = 0; i < size; i++)
         {
-            sequence[i] = buttons[Random.Range(0, 4)];
+            sequence.Add(buttons[Random.Range(0, 4)].GetComponent<ButtonController>());
         }
         return sequence;
     }
 
-    IEnumerator AnimateButtons(GameObject[] sequence) {
-        foreach (GameObject button in sequence)
+    IEnumerator AnimateButtons(List<ButtonController> sequence) 
+    {
+        foreach (ButtonController buttonController in sequence)
         {
-            Debug.Log(button.GetComponent<ButtonController>().type);
-            button.GetComponent<ButtonController>().Inflate();
-            yield return new WaitForSeconds(0.5f);
-            button.GetComponent<ButtonController>().Deflate();
-            yield return new WaitForSeconds(0.5f);
+            yield return StartCoroutine(buttonController.Animate());
         }
     }
 
-    void OnButtonClicked(ButtonController button)
+    IEnumerator WaitPlayerInput() 
     {
-        Debug.Log(button.GetComponent<ButtonController>().type);
+        while (playerSequence.Count < sequence.Count)
+        {
+             yield return null;
+        }
+    }
+
+    bool EvaluatePlayerInput()
+    {
+        bool inputOk = true;
+        for (int i = 0; i < sequenceSize; i++)
+        {
+            if (sequence[i] != playerSequence[i])
+            {
+                inputOk = false;
+                break;
+            }
+        }
+        return inputOk;
+    }
+
+    void OnButtonClicked(ButtonController buttonController)
+    {
+        playerSequence.Add(buttonController);
     }
 }
