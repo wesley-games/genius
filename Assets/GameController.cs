@@ -57,7 +57,7 @@ public class GameController : MonoBehaviour
         List<ButtonController> sequence = new List<ButtonController>();
         for (int i = 0; i < size; i++)
         {
-            sequence.Add(buttons[Random.Range(0, 4)].GetComponent<ButtonController>());
+            sequence.Add(buttons[Random.Range(0, 5)].GetComponent<ButtonController>());
         }
         return sequence;
     }
@@ -94,6 +94,7 @@ public class GameController : MonoBehaviour
 
     void OnButtonClicked(ButtonController buttonController)
     {
+        Debug.Log(buttonController.Type);
         playerSequence.Add(buttonController);
     }
 }

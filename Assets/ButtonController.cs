@@ -20,6 +20,7 @@ public class ButtonController : MonoBehaviour
 
     void OnMouseDown()
     {
+        Debug.Log(Type);
         OnButtonClicked(this);
         StartCoroutine(Animate());
     }
