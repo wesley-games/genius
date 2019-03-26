@@ -1,11 +1,17 @@
-﻿using System.Collections;
+﻿using Array = System.Array;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     public int Level = 1;
     public GameObject[] buttons;
+
+    public Text LevelText;
+    public GameObject LosePanel;
     
     private bool lose = false;
     private int sequenceSize = 3;
@@ -31,24 +37,30 @@ public class GameController : MonoBehaviour
     {
         while (!lose)
         {
+            yield return new WaitForSeconds(2);
+
+            // Generate random sequence
+            Array.ForEach(buttons, b => b.GetComponent<ButtonController>().SetClickable(false));
             sequence = GenerateRandomSequence(sequenceSize);
             yield return StartCoroutine(AnimateButtons(sequence));
+            DebugSequence(sequence); // TO REMOVE
+
+            // Wait for player make his sequence
             playerSequence = new List<ButtonController>();
+            Array.ForEach(buttons, b => b.GetComponent<ButtonController>().SetClickable(true));
             yield return StartCoroutine(WaitPlayerInput());
 
+            // Evaluate player sequence
             if (EvaluatePlayerInput())
             {
-                yield return new WaitForSeconds(2);
-                Debug.Log("Ganhou !");
-                Level++;
-                sequenceSize++;
+                PlayerWinLevel();
             } else
             {
                 lose = true;
             }
             yield return null;
         }
-        Debug.Log("Perdeu !");
+        PlayerLoseLevel();
         yield return null;
     }
 
@@ -94,7 +106,34 @@ public class GameController : MonoBehaviour
 
     void OnButtonClicked(ButtonController buttonController)
     {
-        Debug.Log(buttonController.Type);
         playerSequence.Add(buttonController);
+    }
+
+    void PlayerWinLevel()
+    {
+        sequenceSize++;
+        Level++;
+        LevelText.text = "Level: " + Level;
+    }
+
+    void PlayerLoseLevel()
+    {
+        Array.ForEach(buttons, b => b.GetComponent<ButtonController>().SetClickable(false));
+        LosePanel.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void DebugSequence(List<ButtonController> sequence)
+    {
+        string debug = "";
+        foreach(ButtonController b in sequence)
+        {
+            debug += ", " + b.Type;
+        }
+        Debug.Log(debug);
     }
 }

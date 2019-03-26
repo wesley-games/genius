@@ -10,17 +10,21 @@ public class ButtonController : MonoBehaviour
     public delegate void ButtonClicked(ButtonController button);
     public static event ButtonClicked OnButtonClicked;
 
+    public void SetClickable(bool clickable)
+    {
+        GetComponent<PolygonCollider2D>().enabled = clickable;
+    }
+
     public IEnumerator Animate()
     {
-        transform.localScale += new Vector3(0.3f, 0.3f, 0); // Inflate
+        transform.localScale += new Vector3(0.1f, 0.1f, 0); // Inflate
         yield return new WaitForSeconds(0.5f);
-        transform.localScale -= new Vector3(0.3f, 0.3f, 0); // Deflate
+        transform.localScale -= new Vector3(0.1f, 0.1f, 0); // Deflate
         yield return new WaitForSeconds(0.5f);
     }
 
     void OnMouseDown()
     {
-        Debug.Log(Type);
         OnButtonClicked(this);
         StartCoroutine(Animate());
     }
