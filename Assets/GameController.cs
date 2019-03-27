@@ -14,8 +14,8 @@ public class GameController : MonoBehaviour
     public GameObject LosePanel;
     
     private bool lose = false;
-    private int sequenceSize = 3;
-    private List<ButtonController> sequence;
+    private int sequenceSize = 1;
+    private List<ButtonController> sequence = new List<ButtonController>();
     private List<ButtonController> playerSequence;
 
     void OnEnable()
@@ -41,7 +41,7 @@ public class GameController : MonoBehaviour
 
             // Generate random sequence
             Array.ForEach(buttons, b => b.GetComponent<ButtonController>().SetClickable(false));
-            sequence = GenerateRandomSequence(sequenceSize);
+            GenerateRandomSequence();
             yield return StartCoroutine(AnimateButtons(sequence));
             DebugSequence(sequence); // TO REMOVE
 
@@ -64,14 +64,9 @@ public class GameController : MonoBehaviour
         yield return null;
     }
 
-    List<ButtonController> GenerateRandomSequence(int size)
+    void GenerateRandomSequence()
     {
-        List<ButtonController> sequence = new List<ButtonController>();
-        for (int i = 0; i < size; i++)
-        {
-            sequence.Add(buttons[Random.Range(0, 5)].GetComponent<ButtonController>());
-        }
-        return sequence;
+        sequence.Add(buttons[Random.Range(0, 5)].GetComponent<ButtonController>());
     }
 
     IEnumerator AnimateButtons(List<ButtonController> sequence) 
